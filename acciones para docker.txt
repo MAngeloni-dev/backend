@@ -1,0 +1,6 @@
+Acción
+Iniciar los servicios	docker compose up -d
+Detenerlos	docker compose stop
+Ver logs de Django	docker compose logs --tail=50 backend
+Crear migraciones	docker compose exec backend python manage.py makemigrations
+Aplicar migraciones	docker compose exec backend python manage.py migrate
