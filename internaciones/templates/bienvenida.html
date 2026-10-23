@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>CRM Veterinario</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f1f5f9;
+      color: #0f172a;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(960px, calc(100% - 40px));
+      margin: 70px auto;
+    }
+
+    header {
+      padding: 36px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+    }
+
+    .etiqueta {
+      margin: 0;
+      color: #0f766e;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    h1 {
+      margin: 10px 0;
+      font-size: clamp(30px, 6vw, 44px);
+      line-height: 1.2;
+    }
+
+    .descripcion {
+      max-width: 650px;
+      color: #475569;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    nav a {
+      display: inline-block;
+      padding: 12px 18px;
+      border: 1px solid #0f766e;
+      border-radius: 8px;
+      color: #0f766e;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a.principal {
+      background: #0f766e;
+      color: white;
+    }
+
+    nav a:hover {
+      background: #ccfbf1;
+      color: #134e4a;
+    }
+
+    a:focus-visible {
+      outline: 3px solid #0284c7;
+      outline-offset: 4px;
+    }
+
+    .modulos {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    article {
+      padding: 24px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 19px;
+    }
+
+    article p {
+      margin-bottom: 0;
+      color: #475569;
+    }
+
+    footer {
+      margin-top: 24px;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    @media (max-width: 700px) {
+      main {
+        margin: 30px auto;
+      }
+
+      header {
+        padding: 24px;
+      }
+
+      .modulos {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <header>
+      <p class="etiqueta">Gestión veterinaria</p>
+
+      <h1>CRM Veterinario</h1>
+
+      <p class="descripcion">
+        Sistema para organizar la atención de pacientes,
+        gestionar turnos, acompañar internaciones y controlar
+        las existencias de medicamentos.
+      </p>
+
+      <nav aria-label="Accesos del sistema">
+        <a class="principal" href="{% url 'admin:index' %}">
+          Administración
+        </a>
+
+        <a href="/api/">
+          Explorar API
+        </a>
+      </nav>
+    </header>
+
+    <section class="modulos" aria-label="Módulos del sistema">
+      <article>
+        <h2>Pacientes y turnos</h2>
+        <p>
+          Tutores, pacientes y organización de la agenda
+          de los profesionales.
+        </p>
+      </article>
+
+      <article>
+        <h2>Internaciones</h2>
+        <p>
+          Registro de ingresos, controles, evoluciones
+          y egresos de los pacientes.
+        </p>
+      </article>
+
+      <article>
+        <h2>Medicamentos e inventario</h2>
+        <p>
+          Control de lotes, movimientos, stock mínimo
+          y fechas de vencimiento.
+        </p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

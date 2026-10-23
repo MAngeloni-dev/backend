@@ -20,10 +20,32 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-
+from django.views.generic import TemplateView
+from django.conf import settings
+from .views import error_404
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+        "api/schema/",
+        SpectacularAPIView.as_view(),
+        name="schema",
+    ),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path(
+        "api/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
+    ),
     path("api/", include("pacientes.urls")),
     path("api-auth/", include("rest_framework.urls")),
     path(
@@ -39,5 +61,22 @@ urlpatterns = [
     path("api/usuarios/", include("usuarios.urls")),
     path("api/", include("clinica.urls")),
 
-    path("api/", include("turnos.urls"))
+    path("api/", include("turnos.urls")),
+    path("api/", include("inventario.urls")),
+    path("api/", include("internaciones.urls")),
+    path(
+    "",
+    TemplateView.as_view(template_name="bienvenida.html"),
+        name="bienvenida",
+    ),
 ]
+if settings.DEBUG:
+    urlpatterns += [
+        path(
+            "vista-previa-404/",
+            error_404,
+            {"exception": None},
+            name="vista_previa_404",
+        ),
+    ]
+handler404 = "config.views.error_404"

@@ -38,7 +38,7 @@ class TurnoSerializer(serializers.ModelSerializer):
             "fecha_actualizacion",
         ]
 
-    def get_veterinario_nombre(self, obj):
+    def get_veterinario_nombre(self, obj) -> str:
         return (
             obj.veterinario.get_full_name().strip()
             or obj.veterinario.username
