@@ -38,7 +38,7 @@ class ConsultaSerializer(serializers.ModelSerializer):
             "fecha_actualizacion",
         ]
 
-    def get_veterinario_nombre(self, obj):
+    def get_veterinario_nombre(self, obj) -> str:
         return (
             obj.veterinario.get_full_name()
             or obj.veterinario.username

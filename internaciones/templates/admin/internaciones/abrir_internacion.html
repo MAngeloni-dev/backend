@@ -1,0 +1,190 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+
+  <link
+    rel="stylesheet"
+    href="{% static 'admin/css/forms.css' %}"
+  >
+
+  <style>
+    .internacion-form {
+      max-width: 960px;
+    }
+
+    .internacion-intro {
+      margin-bottom: 24px;
+      color: var(--body-quiet-color);
+      line-height: 1.6;
+    }
+
+    .internacion-form .module h2 {
+      padding: 14px 18px;
+    }
+
+    .internacion-form .form-row {
+      padding: 18px;
+    }
+
+    .internacion-campo {
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr);
+      gap: 12px 20px;
+      align-items: start;
+    }
+
+    .internacion-campo label {
+      float: none;
+      width: auto;
+      padding: 10px 0 0;
+      font-weight: 600;
+    }
+
+    .internacion-control {
+      min-width: 0;
+    }
+
+    .internacion-control input,
+    .internacion-control select,
+    .internacion-control textarea {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font: inherit;
+    }
+
+    .internacion-control select {
+      height: auto;
+      min-height: 42px;
+    }
+
+    .internacion-control textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .internacion-control .help {
+      margin: 8px 0 0;
+      padding: 0;
+    }
+
+    .internacion-control .errorlist {
+      margin: 0 0 8px;
+      padding: 0;
+    }
+
+    .internacion-form .submit-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .internacion-volver {
+      padding: 10px 14px;
+    }
+
+    @media (max-width: 767px) {
+      .internacion-campo {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .internacion-campo label {
+        padding: 0;
+      }
+
+      .internacion-form .submit-row {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Inicio</a>
+    &rsaquo;
+    <a href="{% url 'admin:internaciones_internacion_changelist' %}">
+      Internaciones
+    </a>
+    &rsaquo; Abrir internación
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div id="content-main" class="internacion-form">
+    <p class="internacion-intro">
+      Seleccioná el paciente y el profesional a cargo.
+      La fecha de ingreso y el usuario que registra la
+      internación se asignan automáticamente.
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+
+      {% if form.errors %}
+        <p class="errornote" role="alert">
+          No se pudo registrar la internación.
+          Revisá los errores indicados.
+        </p>
+      {% endif %}
+
+      {{ form.non_field_errors }}
+
+      <fieldset class="module aligned">
+        <h2>Datos del ingreso</h2>
+
+        {% for field in form %}
+          <div class="form-row{% if field.errors %} errors{% endif %}">
+            <div class="internacion-campo">
+              <label
+                for="{{ field.id_for_label }}"
+                {% if field.field.required %}class="required"{% endif %}
+              >
+                {{ field.label }}
+                {% if field.field.required %}*{% endif %}
+              </label>
+
+              <div class="internacion-control">
+                {{ field.errors }}
+                {{ field }}
+
+                {% if field.help_text %}
+                  <div class="help">
+                    {{ field.help_text }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </fieldset>
+
+      <p class="internacion-intro">
+        Los campos con * son obligatorios.
+      </p>
+
+      <div class="submit-row">
+        <a
+          class="internacion-volver"
+          href="{% url 'admin:internaciones_internacion_changelist' %}"
+        >
+          Cancelar y volver
+        </a>
+
+        <input
+          type="submit"
+          value="Registrar internación"
+          class="default"
+        >
+      </div>
+    </form>
+  </div>
+{% endblock %}

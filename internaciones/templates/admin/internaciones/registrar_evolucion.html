@@ -1,0 +1,144 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+
+  <link
+    rel="stylesheet"
+    href="{% static 'admin/css/forms.css' %}"
+  >
+
+  <style>
+    .evolucion-form {
+      max-width: 960px;
+    }
+
+    .evolucion-form .form-row {
+      padding: 18px;
+    }
+
+    .evolucion-campo {
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr);
+      gap: 12px 20px;
+      align-items: start;
+    }
+
+    .evolucion-campo label {
+      float: none;
+      width: auto;
+      padding: 10px 0 0;
+      font-weight: 600;
+    }
+
+    .evolucion-control {
+      min-width: 0;
+    }
+
+    .evolucion-control input,
+    .evolucion-control select,
+    .evolucion-control textarea {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font: inherit;
+    }
+
+    .evolucion-control select {
+      height: auto;
+      min-height: 42px;
+    }
+
+    .evolucion-control textarea {
+      height: 120px;
+      resize: vertical;
+    }
+
+    .evolucion-control .help {
+      margin: 8px 0 0;
+      padding: 0;
+    }
+
+    .evolucion-control .errorlist {
+      margin: 0 0 8px;
+      padding: 0;
+    }
+
+    @media (max-width: 767px) {
+      .evolucion-campo {
+        grid-template-columns: 1fr;
+      }
+
+      .evolucion-campo label {
+        padding: 0;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div id="content-main" class="evolucion-form">
+    <p>
+      Seleccioná una internación abierta.
+      El profesional y la fecha del control se asignarán
+      automáticamente. Los campos con * son obligatorios.
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+
+      {% if form.errors %}
+        <p class="errornote" role="alert">
+          No se pudo registrar la evolución.
+          Revisá los errores indicados.
+        </p>
+      {% endif %}
+
+      {{ form.non_field_errors }}
+
+      <fieldset class="module aligned">
+        <h2>Datos del control</h2>
+
+        {% for field in form %}
+          <div class="form-row{% if field.errors %} errors{% endif %}">
+            <div class="evolucion-campo">
+              <label
+                for="{{ field.id_for_label }}"
+                {% if field.field.required %}class="required"{% endif %}
+              >
+                {{ field.label }}
+                {% if field.field.required %}*{% endif %}
+              </label>
+
+              <div class="evolucion-control">
+                {{ field.errors }}
+                {{ field }}
+
+                {% if field.help_text %}
+                  <div class="help">
+                    {{ field.help_text }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </fieldset>
+
+      <div class="submit-row">
+        <input
+          type="submit"
+          value="Registrar evolución"
+          class="default"
+        >
+
+        <a href="{{ url_volver }}" class="closelink">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

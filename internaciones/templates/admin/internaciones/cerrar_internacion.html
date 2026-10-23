@@ -1,0 +1,65 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link
+    rel="stylesheet"
+    href="{% static 'admin/css/forms.css' %}"
+  >
+{% endblock %}
+
+{% block content %}
+  <div id="content-main" style="max-width: 800px;">
+    <p>
+      Paciente:
+      <strong>{{ internacion.paciente.nombre }}</strong>
+    </p>
+
+    <p>
+      Seleccioná el motivo del cierre.
+      Se registrará la fecha y hora actuales como egreso.
+      Después no se podrán agregar nuevas evoluciones.
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+
+      {% if form.errors %}
+        <p class="errornote" role="alert">
+          No se pudo cerrar la internación.
+          Revisá el mensaje indicado.
+        </p>
+      {% endif %}
+
+      {{ form.non_field_errors }}
+
+      <fieldset class="module aligned">
+        <h2>Datos del cierre</h2>
+
+        {% for field in form %}
+          <div class="form-row">
+            {{ field.errors }}
+
+            <div>
+              {{ field.label_tag }}
+              {{ field }}
+            </div>
+          </div>
+        {% endfor %}
+      </fieldset>
+
+      <div class="submit-row">
+        <input
+          type="submit"
+          value="Confirmar cierre"
+          class="default"
+        >
+
+        <a href="{{ url_detalle }}" class="closelink">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+{% endblock %}
