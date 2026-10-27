@@ -2,7 +2,15 @@ from django.contrib import admin
 from django.utils import timezone
 
 from .models import Lote, Medicamento, MovimientoStock
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect, render
+from django.urls import path, reverse
+from rest_framework.exceptions import APIException
 
+from usuarios.models import Usuario
+
+from .forms import RegistrarMovimientoAdminForm
+from .services import registrar_movimiento
 
 @admin.register(Medicamento)
 class MedicamentoAdmin(admin.ModelAdmin):
@@ -163,7 +171,88 @@ class MovimientoStockAdmin(admin.ModelAdmin):
     ]
 
     def has_add_permission(self, request):
-        return False
+        return (
+            request.user.rol in {
+                Usuario.Rol.ADMINISTRADOR,
+                Usuario.Rol.VETERINARIO,
+            }
+            and request.user.has_perm(
+                "inventario.add_movimientostock"
+            )
+    )
+
+    def get_urls(self):
+        urls_personalizadas = [
+            path(
+                "add/",
+                self.admin_site.admin_view(
+                    self.registrar_desde_admin
+                ),
+                name="inventario_movimientostock_add",
+            ),
+        ]
+
+        return urls_personalizadas + super().get_urls()
+
+    def registrar_desde_admin(self, request):
+        if not self.has_add_permission(request):
+            raise PermissionDenied
+
+        form = RegistrarMovimientoAdminForm(
+            request.POST if request.method == "POST" else None
+        )
+
+        if request.method == "POST" and form.is_valid():
+            datos = form.cleaned_data
+
+            try:
+                movimiento = registrar_movimiento(
+                    lote_id=datos["lote"].pk,
+                    tipo=datos["tipo"],
+                    cantidad=datos["cantidad"],
+                    motivo=datos["motivo"],
+                    observaciones=datos["observaciones"],
+                    responsable=request.user,
+                )
+            except APIException as error:
+                form.add_error(None, str(error.detail))
+            else:
+                self.log_addition(
+                    request,
+                    movimiento,
+                    "Movimiento registrado desde el administrador.",
+                )
+
+                self.message_user(
+                    request,
+                    "Movimiento registrado y stock actualizado.",
+                )
+
+                return redirect(
+                    reverse(
+                        "admin:inventario_movimientostock_changelist",
+                        current_app=self.admin_site.name,
+                    )
+                )
+
+        contexto = {
+            **self.admin_site.each_context(request),
+            "title": "Registrar movimiento de stock",
+            "opts": self.model._meta,
+            "form": form,
+            "url_volver": reverse(
+                "admin:inventario_movimientostock_changelist",
+                current_app=self.admin_site.name,
+            ),
+        }
+
+        request.current_app = self.admin_site.name
+
+        return render(
+            request,
+            "admin/inventario/registrar_movimiento.html",
+            contexto,
+        )
 
     def has_change_permission(self, request, obj=None):
         return False
