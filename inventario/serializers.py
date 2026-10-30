@@ -59,7 +59,6 @@ class MedicamentoSerializer(serializers.ModelSerializer):
             "via_administracion",
             "especies",
             "stock_minimo",
-            "stock_minimo",
             "stock_utilizable",
             "observaciones",
             "activo",
