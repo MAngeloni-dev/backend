@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.functions import Lower
@@ -241,6 +242,25 @@ class Lote(models.Model):
 
         if errores:
             raise ValidationError(errores)
+
+    def save(self, *args, **kwargs):
+        if (
+            self.fecha_vencimiento
+            and self.fecha_vencimiento < timezone.localdate()
+        ):
+            self.activo = False
+
+            # También persistimos la baja cuando el servicio
+            # guarda únicamente stock y fecha de actualización.
+            update_fields = kwargs.get("update_fields")
+
+            if update_fields is not None:
+                kwargs["update_fields"] = {
+                    *update_fields,
+                    "activo",
+                }
+
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return (

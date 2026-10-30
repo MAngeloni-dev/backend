@@ -93,34 +93,30 @@ def registrar_movimiento(
         MovimientoStock.Tipo.AJUSTE_ENTRADA,
     }
 
-    operaciones_normales = {
-        MovimientoStock.Tipo.INGRESO,
-        MovimientoStock.Tipo.RETIRO,
-    }
+    vencido = lote.fecha_vencimiento < timezone.localdate()
 
-    # Los ajustes permiten corregir el inventario físico,
-    # incluso de productos inactivos o vencidos.
-    if tipo in operaciones_normales:
-        if not lote.activo or not lote.medicamento.activo:
-            raise ValidationError(
-                {
-                    "lote": [
-                        "El lote y el medicamento deben estar activos."
-                    ]
-                }
-            )
+    # Un lote vencido o inactivo solo permite descontar
+    # existencias para registrar un descarte.
+    no_disponible = (
+        vencido
+        or not lote.activo
+        or not lote.medicamento.activo
+    )
 
-        if lote.fecha_vencimiento < timezone.localdate():
-            raise ValidationError(
-                {
-                    "lote": [
-                        "No se permiten ingresos ni retiros normales "
-                        "sobre un lote vencido. "
-                        "Usá un ajuste para registrar una corrección "
-                        "o un descarte."
-                    ]
-                }
-            )
+    if (
+        no_disponible
+        and tipo != MovimientoStock.Tipo.AJUSTE_SALIDA
+    ):
+        raise ValidationError(
+            {
+                "lote": [
+                    "El lote está vencido, inactivo o pertenece "
+                    "a un medicamento inactivo. Solo se permite "
+                    "un ajuste de salida para registrar "
+                    "el descarte de existencias."
+                ]
+            }
+        )
 
     cantidad_anterior = lote.cantidad_actual
 
