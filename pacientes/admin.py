@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import Especie, Paciente, Raza, Tutor
 
-
+from django.utils.html import format_html
 class PacienteInline(admin.TabularInline):
     model = Paciente
     fields = ("nombre", "especie", "raza", "sexo", "activo")
