@@ -1,0 +1,59 @@
+name: veterinaria
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: veterinaria
+      POSTGRES_USER: veterinaria
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U veterinaria -d veterinaria"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: veterinaria
+      POSTGRES_USER: veterinaria
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    profiles: ["frontend"]
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    environment:
+      WATCHPACK_POLLING: "true"
+      DJANGO_API_URL: "http://backend:8000"
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ../frontend:/app
+      - frontend_node_modules:/app/node_modules
+      - frontend_next:/app/.next
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  frontend_node_modules:
+  frontend_next:
