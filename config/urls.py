@@ -20,6 +20,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+
 from django.views.generic import TemplateView
 from django.conf import settings
 from .views import error_404
@@ -81,3 +82,9 @@ if settings.DEBUG:
         ),
     ]
 handler404 = "config.views.error_404"
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT,
+    )
