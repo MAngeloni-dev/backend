@@ -6,6 +6,7 @@ dist/
 wheels/
 *.egg-info
 media/
+staticfiles/
 # Virtual environments
 .venv
 .env
